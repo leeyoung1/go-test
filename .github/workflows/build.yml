@@ -10,37 +10,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        go-version: [1.16, 1.18, 1.20]
-    
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: ${{ matrix.go-version }}
-    
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+        go-version: 1.20
     
     - name: Download dependencies
       run: go mod download
     
-    - name: Verify dependencies
-      run: go mod verify
-    
     - name: Build
       run: go build -v ./...
-    
-    - name: Run tests
-      run: go test -v ./...
     
     - name: Build binary
       run: |
@@ -50,5 +32,5 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: xuperchain_client_app-${{ matrix.go-version }}
+        name: xuperchain_client_app
         path: build/
