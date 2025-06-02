@@ -8,7 +8,20 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            binary_name: xuperchain_client_app_linux
+          - os: macos-latest
+            goos: darwin
+            goarch: amd64
+            binary_name: xuperchain_client_app_macos
+    
+    runs-on: ${{ matrix.os }}
     
     steps:
     - uses: actions/checkout@v4
@@ -32,10 +45,10 @@ jobs:
     - name: Build binary
       run: |
         mkdir -p build
-        go build -o build/xuperchain_client_app .
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o build/${{ matrix.binary_name }} .
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: xuperchain_client_app
+        name: ${{ matrix.binary_name }}
         path: build/
